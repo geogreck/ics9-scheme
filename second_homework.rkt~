@@ -1,4 +1,0 @@
-(define (my-range a b d)
-  (if (< a b)
-      (cons a (my-range (+ a d) b d))
-      '()))
