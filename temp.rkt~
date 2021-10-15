@@ -1,0 +1,4 @@
+(define (delete pred? xs)
+  (cond ((null? xs) '())
+        ((pred? (car xs)) (append (delete pred? (cdr xs))))
+        (else (append (car xs) (delete pred? (cdr xs))))))

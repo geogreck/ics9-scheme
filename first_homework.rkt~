@@ -1,0 +1,9 @@
+(define (day-of-week day month year)
+  (if (or (> year 1582) (
+  (remainder (+ day (quotient  (* 31 (+ month (* 12 (quotient  (- 14 month) 12)) -2)) 12) (- year (quotient  (- 14 month) 12))
+     (quotient  (- year (quotient  (- 14 month) 12)) 4) (* -1 (quotient  (- year (quotient  (- 14 month) 12)) 100))
+     (quotient  (- year (quotient  (- 14 month) 12)) 400)) 7))
+
+;;(define (square-roots a b c)
+;;  (
+ ;; a = (/ (- 14 month) 12)

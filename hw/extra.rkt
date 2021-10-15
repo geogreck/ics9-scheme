@@ -1,0 +1,26 @@
+(define (check-year year)
+  (if (= (remainder year 100) 0)
+      (= (remainder year 400) 0)
+      (= (remainder year 4) 0)))
+
+(define (calc-day year)
+  (if (check-year year)
+      " 12 сентября"
+      " 13 сентября"))
+
+(define (prog-day year)
+  (cond ((> year 2021) (display (list "Будет праздноваться официально" (calc-day year))))
+        ((> year 2009) (display (list "Праздновался официально" (calc-day year))))
+        ((> year 2002) (display (list "Праздновался неофициально" (calc-day year))))
+        (else (display "(Не праздновался)"))))
+       
+(prog-day 2005)
+(newline)
+(prog-day 2012)
+(newline)
+(prog-day 2021)
+(newline)
+(prog-day 2024)
+(newline)
+(prog-day 1990)
+(newline)

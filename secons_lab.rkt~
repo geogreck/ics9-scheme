@@ -1,0 +1,7 @@
+(define (count x xs)
+  (if (> (length xs) 0)
+      (count (+ 1 x) (cdr xs))
+      x))
+
+
+      

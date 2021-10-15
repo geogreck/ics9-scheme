@@ -1,0 +1,6 @@
+(define (prog-day year)
+  (cond ((> year 2021) (display "Будет праздноваться "))
+        ((> year 2002) (display "Праздновался"))
+        (else 
+        
+                       

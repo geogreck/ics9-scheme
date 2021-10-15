@@ -1,0 +1,106 @@
+
+;;;;; Task 3
+(define (cut-first-string a)
+  (list->string (cdr (string->list a))))
+
+(define (string-trim-left a)
+  (if (and (not(equal? "" a))
+           (char-whitespace? (string-ref a 0)))
+      (string-trim-left (cut-first-string a))
+      a))
+
+(define (cut-last-string a)
+  (list->string(reverse (cdr (reverse (string->list a))))))
+
+(define (string-trim-right a)
+  (if (and (not(equal? "" a))
+           (char-whitespace? (string-ref a (- (string-length a) 1))))
+      (string-trim-right (cut-last-string a))
+      a))
+
+(define (string-trim a)
+  (string-trim-right (string-trim-left a)))
+
+(define (string-prefix? a b)
+  (cond ((equal? a "") #t)
+        ((equal? a b) #t)
+        ((>= (string-length a) (string-length b)) #f)
+        ((equal? (string-ref a 0) (string-ref b 0)) (string-prefix? (cut-first-string a) (cut-first-string b)))
+        (else #f)))
+
+(define (reverse-string a)
+  (list->string (reverse (string->list a))))
+
+(define (string-suffix? a b)
+  (string-prefix? (reverse-string a) (reverse-string b)))
+
+(define (string-infix? a b)
+  (cond ((equal? a "") #t)
+        ((equal? a b) #t)
+        ((>= (string-length a) (string-length b)) #f)
+        ((equal? (string-ref a 0) (string-ref b 0)) (string-infix? (cut-first-string a) (cut-first-string b)))
+        (else (string-infix? a (cut-first-string b)))))
+
+(define (cut-n-string a n)
+  (if (> n 0)
+      (cut-n-string (cut-first-string a) (- n 1))
+      a))
+
+(define (string-split str sep)
+  (cond ((equal? str "") '())
+        ((string-prefix? sep str) '())))
+
+(define (string-split str sep)
+  (define (loop lstr buff)
+    (if (null? lstr)
+        (list (list->string buff))
+        (if (string-prefix? sep (list->string lstr))
+            (cons (list->string buff)
+                  (loop (string->list (cut-n-string (list->string lstr) (string-length sep)))
+                        '()))
+            (loop (cdr lstr) (append buff (list (car lstr)))))))
+  (loop (string->list str) '()))
+
+
+;;;;;Task 4
+
+(define (make-multi-vector sizes . fill)
+  (vector "multi-vector-structure" sizes (if (null? fill)
+                                             (make-vector (apply * sizes))
+                                             (make-vector (apply * sizes) (car fill)))))
+
+(define (multi-vector? m)
+  (equal? (vector-ref m 0) "multi-vector-structure"))
+
+(define (lists-multiply indices sizes)
+  (if (= (length indices) 1)
+      (car indices)
+      (+ (* (car indices)
+            (apply * (cdr sizes)))
+         (lists-multiply (cdr indices) (cdr sizes)))))
+
+(define (multi-vector-ref m indices)
+  (vector-ref (vector-ref m 2) (lists-multiply indices (vector-ref m 1))))
+  
+        
+(define (multi-vector-set! m indices x)
+  (vector-set! (vector-ref m 2) (lists-multiply indices (vector-ref m 1)) x))
+
+(define m (make-multi-vector '(11 12 9 16)))
+(multi-vector? m)
+(multi-vector-set! m '(10 7 6 12) 'test)
+(multi-vector-ref m '(10 7 6 12))
+(multi-vector-set! m '(1 2 1 1) 'X)
+(multi-vector-set! m '(2 1 1 1) 'Y)
+(multi-vector-ref m '(1 2 1 1))
+(multi-vector-ref m '(2 1 1 1))
+(define m (make-multi-vector '(3 5 7) -1))
+(multi-vector-ref m '(0 0 0))
+
+(define z (make-multi-vector '(2 2)))
+z
+(multi-vector-set! z '(1 0) 'a)
+(multi-vector-set! z '(0 1) 'b)
+z
+(multi-vector-ref z '(0 1))
+(multi-vector-ref z '(1 0))
