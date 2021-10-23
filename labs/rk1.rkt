@@ -1,0 +1,17 @@
+(define (improper->proper xs)
+  (if (list? xs) xs)
+  (if (and (pair? xs) (pair? (car xs))) (improper->proper (car xs)))
+  (if (pair? xs) (cons (car xs) (improper->proper (cdr xs))))
+  (if (and (not (list? xs)) (not (and (pair? xs) (pair? (car xs)))) (not (pair? xs))) (cons xs '())))
+
+(define (improper->proper xs)
+  (if (list? xs) xs
+    (if (pair? xs)
+        (if (pair? (car xs))
+            (cons (improper->proper (car xs))
+                  (improper->proper (cdr xs)))
+            (cons (car xs) 
+                  (improper->proper (cdr xs))))
+            (if (pair? xs)
+                (cons (improper->proper xs) '())
+                (cons xs '())))))
