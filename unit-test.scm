@@ -5,7 +5,7 @@
 
 (define (run-test test)
   (begin
-    (display (car test))
+    (write (car test))
   (if (equal? (eval (car test) (interaction-environment))
               (caadr test))
       (begin
@@ -14,10 +14,10 @@
       (begin
         (display " FAIL\n")
         (display "  Expected: ")
-        (display (caadr test))
+        (write (caadr test))
         (newline)
         (display "  Returned: ")
-        (display (eval (car test) (interaction-environment)))
+        (write (eval (car test) (interaction-environment)))
         (newline)
         #f))))
 

@@ -117,4 +117,21 @@
               (+  (expt ,@`(,(cadadr expression)) 2) (expt ,@`(,(car (cdaddr expression))) 2) (* ,@`(,(cadadr expression)) ,@`(,(car (cdaddr expression))))))
           `(* (+ ,@`(,(cadadr expression)) ,@`(,(car (cdaddr expression))))
               (+  (expt ,@`(,(cadadr expression)) 2) (expt ,@`(,(car (cdaddr expression))) 2) (- (* ,@`(,(cadadr expression)) ,@`(,(car (cdaddr expression))))))))))
-  
+
+
+(define counter
+  (let ((x 0))
+    (lambda ()
+      (set! x (+ x 1))
+      x)))
+      
+(define counter-tests
+  (list (test (counter) 1)
+          (test (counter) 3)
+          (test (counter) 3)))
+
+(run-tests counter-tests)
+
+(+ (trace-ex (counter)) 1)
+
+(* (trace-ex (counter)) 100)
