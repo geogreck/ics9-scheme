@@ -115,7 +115,7 @@
                 ((assoc command dictionary) => (lambda (called-proc)
                                                  (loop (+ index 1)
                                                        dictionary
-                                                       (interpret-sub(trace-ex (cadr called-proc)) stack dictionary)))) ;; FIXME не передается состояние dictionary
+                                                       (interpret-sub(trace-ex (cadr called-proc)) stack dictionary))))
                 ((equal? 'exit command) stack)
                 ((equal? 'if command)
                  (let* ((body (iffish))
@@ -132,8 +132,8 @@
                        dictionary
                        stack)))))))
 
-  (define (interpret program stack)
-    (interpret-sub program stack '()))
+(define (interpret program stack)
+  (interpret-sub program stack '()))
 
 (load "../unit-test.scm")
 
