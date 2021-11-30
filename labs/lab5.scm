@@ -11,9 +11,9 @@
 (define mod remainder)
 
 ;; -> stack после выполнения program
-(define (interpret program stack)
+(define (interpret-sub program stack dictionary)
   (let loop ((index 0)
-             (dictionary '())
+             (dictionary dictionary)
              (stack stack))
     (if (= index (vector-length program))
         stack
@@ -115,17 +115,25 @@
                 ((assoc command dictionary) => (lambda (called-proc)
                                                  (loop (+ index 1)
                                                        dictionary
-                                                       (interpret (cadr called-proc) stack)))) ;; FIXME не передается состояние dictionary
+                                                       (interpret-sub(trace-ex (cadr called-proc)) stack dictionary)))) ;; FIXME не передается состояние dictionary
                 ((equal? 'exit command) stack)
                 ((equal? 'if command)
                  (let* ((body (iffish))
                         (val (vector-length body)))
-                   (loop (+ index val 2)
-                         dictionary
-                         (if (= 0 (car stack))
-                             (cdr stack)
-                             (interpret body (cdr stack)))))))))))
+                   (if (= 0 (car stack))
+                       (loop (+ index val 2)
+                             dictionary
+                             (cdr stack))
+                       (loop (+ index 1)
+                             dictionary
+                             (cdr stack)))))
+                ((equal? 'endif command)
+                 (loop (+ index 1)
+                       dictionary
+                       stack)))))))
 
+  (define (interpret program stack)
+    (interpret-sub program stack '()))
 
 (load "../unit-test.scm")
 
