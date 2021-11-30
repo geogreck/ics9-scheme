@@ -1,4 +1,8 @@
-;;соавтор аня шипель
+;соавтор grechkogv@bmstu.ru
+;соавтор starovoytovai@bmstu.ru
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; соавтор аня шипель ;;
+;;;;;;;;;;;;;;;;;;;;;;;;
 
 (load "../trace.scm")
 
@@ -9,6 +13,10 @@
              (loop (cdr list))))))
 
 (define mod remainder)
+
+(define-syntax oper:
+  (syntax-rules (mod)
+    ((oper: a mod b)(mod a b))))
 
 ;; -> stack после выполнения program
 (define (interpret-sub program stack dictionary)
@@ -169,77 +177,76 @@
                               define -- exit 1 - end
                               5 -- --) '()) (5 25)) ;; TODO списать лабу
         (test (interpret #(10 4 dup) '()) (4 4 10))
-  (test (interpret #(   define abs
-                      dup 0 <
-                      if neg endif
-                  end
-                   9 abs
-                   -9 abs
-                   10 abs
-                   -10 abs) (quote ()))
-     (10 10 9 9))
+        (test (interpret #(   define abs
+                            dup 0 <
+                            if neg endif
+                            end
+                            9 abs
+                            -9 abs
+                            10 abs
+                            -10 abs) (quote ()))
+              (10 10 9 9))
 
-  (test (interpret #(   define =0? dup 0 = end
-                  define <0? dup 0 < end
-                  define signum
-                      =0? if exit endif
-                      <0? if drop -1 exit endif
-                      drop
-                      1
-                  end
-                   0 signum
-                  -5 signum
-                  10 signum       ) (quote ()))
-     (1 -1 0))
+        (test (interpret #(   define =0? dup 0 = end
+                            define <0? dup 0 < end
+                            define signum
+                            =0? if exit endif
+                            <0? if drop -1 exit endif
+                            drop
+                            1
+                            end
+                            0 signum
+                            -5 signum
+                            10 signum       ) (quote ()))
+              (1 -1 0))
 
-  (test (interpret #(   define -- 1 - end
-                  define =0? dup 0 = end
-                  define =1? dup 1 = end
-                  define factorial
-                      =0? if drop 1 exit endif
-                      =1? if drop 1 exit endif
-                      dup --
-                      factorial
-                      *
-                  end
-                  0 factorial
-                  1 factorial
-                  2 factorial
-                  3 factorial
-                  4 factorial     ) (quote ()))
-     (24 6 2 1 1))
+        (test (interpret #(   define -- 1 - end
+                            define =0? dup 0 = end
+                            define =1? dup 1 = end
+                            define factorial
+                            =0? if drop 1 exit endif
+                            =1? if drop 1 exit endif
+                            dup --
+                            factorial
+                            *
+                            end
+                            0 factorial
+                            1 factorial
+                            2 factorial
+                            3 factorial
+                            4 factorial     ) (quote ()))
+              (24 6 2 1 1))
 
-  (test (interpret #(   define =0? dup 0 = end
-                  define =1? dup 1 = end
-                  define -- 1 - end
-                  define fib
-                      =0? if drop 0 exit endif
-                      =1? if drop 1 exit endif
-                      -- dup
-                      -- fib
-                      swap fib
-                      +
-                  end
-                  define make-fib
-                      dup 0 < if drop exit endif
-                      dup fib
-                      swap --
-                      make-fib
-                  end
-                  10 make-fib     ) (quote ()))
-     (0 1 1 2 3 5 8 13 21 34 55))
+        (test (interpret #(   define =0? dup 0 = end
+                            define =1? dup 1 = end
+                            define -- 1 - end
+                            define fib
+                            =0? if drop 0 exit endif
+                            =1? if drop 1 exit endif
+                            -- dup
+                            -- fib
+                            swap fib
+                            +
+                            end
+                            define make-fib
+                            dup 0 < if drop exit endif
+                            dup fib
+                            swap --
+                            make-fib
+                            end
+                            10 make-fib     ) (quote ()))
+              (0 1 1 2 3 5 8 13 21 34 55))
 
-  (test (interpret #(   define =0? dup 0 = end
-                  define gcd
-                      =0? if drop exit endif
-                      swap over mod
-                      gcd
-                  end
-                  90 99 gcd
-                  234 8100 gcd    ) '())
-     (18 9))
-  (test (interpret #(define =0? dup 0 = end =0?) '(0)) (-1 0))
-  (test (interpret #(define =0? dup 0 = end define kek 0 =0? end kek) '()) (-1 0))
-        ))
+        (test (interpret #(   define =0? dup 0 = end
+                            define gcd
+                            =0? if drop exit endif
+                            swap over mod
+                            gcd
+                            end
+                            90 99 gcd
+                            234 8100 gcd    ) '())
+              (18 9))
+        (test (interpret #(define =0? dup 0 = end =0?) '(0)) (-1 0))
+        (test (interpret #(define =0? dup 0 = end define kek 0 =0? end kek) '()) (-1 0))))
 
 (run-tests tests)
