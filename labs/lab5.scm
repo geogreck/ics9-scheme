@@ -4,19 +4,11 @@
 ;; соавтор аня шипель ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
-(load "../trace.scm")
-
 (define (contains? elem list)
   (let loop ((list list))
     (and (not (null? list))
          (or (equal? (car list) elem)
              (loop (cdr list))))))
-
-(define mod remainder)
-
-(define-syntax oper:
-  (syntax-rules (mod)
-    ((oper: a mod b)(mod a b))))
 
 ;; -> stack после выполнения program
 (define (interpret-sub program stack dictionary)
@@ -77,8 +69,6 @@
                              ((equal? 'over command) (cons (cadr stack) stack))
                              ((equal? 'rot command) (cons (caddr stack) (cons (cadr stack) (cons (car stack) (cdddr stack)))))
                              ((equal? 'depth command)(cons (length stack) stack)))))
-              (definition? (lambda (command)
-                         (equal? 'define command)))
               (definition (lambda () ;; -> '(word #())
                             (list (vector-ref program (+ index 1))
                                   (let loop ((index (+ index 2))
@@ -114,7 +104,7 @@
                  (loop (+ index 1)
                        dictionary
                        (stack-anya command stack)))
-                ((definition? command) ;; TODO убрать definition?
+                ((equal? 'define command)
                  (let* ((new-proc (definition))
                         (val (vector-length (cadr new-proc))))
                    (loop (+ index val 3)
