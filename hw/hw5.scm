@@ -22,61 +22,61 @@
         stack
         (let ((command (vector-ref program index)))
           ;; выполнить операции со стеком, перейти к выполнению следующего слова
-          (let-syntax ((nxt-w-new-st (syntax-rules ()
+          (let-syntax ((call-next (syntax-rules ()
                                        ((_ new-stack)
                                         (interpret-internal new-stack
                                                             (+ index 1)
                                                             dictionary)))))
             (if (number? command)
-                (nxt-w-new-st (cons command stack))
+                (call-next (cons command stack))
                 (case command
-                  (+ (nxt-w-new-st (cons (+ (cadr stack) (car stack))
+                  (+ (call-next (cons (+ (cadr stack) (car stack))
                                          (cddr stack))))
-                  (- (nxt-w-new-st (cons (- (cadr stack) (car stack))
+                  (- (call-next (cons (- (cadr stack) (car stack))
                                          (cddr stack))))
-                  (* (nxt-w-new-st (cons (* (cadr stack) (car stack))
+                  (* (call-next (cons (* (cadr stack) (car stack))
                                          (cddr stack))))
-                  (/ (nxt-w-new-st (cons (quotient (cadr stack) (car stack))
+                  (/ (call-next (cons (quotient (cadr stack) (car stack))
                                          (cddr stack))))
-                  (mod (nxt-w-new-st (cons (remainder (cadr stack) (car stack))
+                  (mod (call-next (cons (remainder (cadr stack) (car stack))
                                            (cddr stack))))
-                  (neg (nxt-w-new-st (cons (- (car stack))
+                  (neg (call-next (cons (- (car stack))
                                            (cdr stack))))
-                  (= (nxt-w-new-st (cons (if (= (cadr stack) (car stack))
+                  (= (call-next (cons (if (= (cadr stack) (car stack))
                                              -1
                                              0)
                                          (cddr stack))))
-                  (< (nxt-w-new-st (cons (if (< (cadr stack) (car stack))
+                  (< (call-next (cons (if (< (cadr stack) (car stack))
                                              -1
                                              0)
                                          (cddr stack))))
-                  (> (nxt-w-new-st (cons (if (> (cadr stack) (car stack))
+                  (> (call-next (cons (if (> (cadr stack) (car stack))
                                              -1
                                              0)
                                          (cddr stack))))
-                  (not (nxt-w-new-st (cons (if (equal? (car stack) 0)
+                  (not (call-next (cons (if (equal? (car stack) 0)
                                                -1
                                                0)
                                            (cdr stack))))
-                  (and (nxt-w-new-st (cons (if (and (not (equal? (car stack) 0))
+                  (and (call-next (cons (if (and (not (equal? (car stack) 0))
                                                     (not (equal? (cadr stack) 0)))
                                                -1
                                                0)
                                            (cddr stack))))
-                  (or (nxt-w-new-st (cons (if (or (not (equal? (car stack) 0))
+                  (or (call-next (cons (if (or (not (equal? (car stack) 0))
                                                   (not (equal? (cadr stack) 0)))
                                               -1
                                               0)
                                           (cddr stack))))
-                  (drop (nxt-w-new-st (cdr stack)))
-                  (swap (nxt-w-new-st (cons (cadr stack)
+                  (drop (call-next (cdr stack)))
+                  (swap (call-next (cons (cadr stack)
                                             (cons (car stack) (cddr stack)))))
-                  (dup (nxt-w-new-st (cons (car stack) stack)))
-                  (over (nxt-w-new-st (cons (cadr stack) stack)))
-                  (rot (nxt-w-new-st (cons (caddr stack)
+                  (dup (call-next (cons (car stack) stack)))
+                  (over (call-next (cons (cadr stack) stack)))
+                  (rot (call-next (cons (caddr stack)
                                            (cons (cadr stack)
                                                  (cons (car stack) (cdddr stack))))))
-                  (depth (nxt-w-new-st (cons (length stack) stack)))
+                  (depth (call-next (cons (length stack) stack)))
                   (define (interpret-internal stack
                                               (+ 1 ;; следующее слово за end
                                                  (let loop ((index (+ index 2))) ;; вернет индекс следующего end
@@ -117,8 +117,8 @@
                           ;; выполняем первую ветку
                           ;; если встретится else - скипнется вторая ветка
                           ;; если endif - выполняем следующее слово
-                          (nxt-w-new-st (cdr stack))))
-                  (endif (nxt-w-new-st stack))
+                          (call-next (cdr stack))))
+                  (endif (call-next stack))
                   ;; в case нельзя использовать else, поэтому обработаю его тут
                   (else (if (eqv? command 'else)
                             (interpret-internal stack
@@ -134,6 +134,6 @@
                                                 dictionary)
                             ;; ищем статью в словаре
                             (let ((jmp-index (cadr (assoc command dictionary))))
-                              (nxt-w-new-st (interpret-internal stack
+                              (call-next (interpret-internal stack
                                                                 jmp-index
                                                                 dictionary))))))))))))
