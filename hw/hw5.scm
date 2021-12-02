@@ -23,59 +23,59 @@
         (let ((command (vector-ref program index)))
           ;; выполнить операции со стеком, перейти к выполнению следующего слова
           (let-syntax ((call-next (syntax-rules ()
-                                       ((_ new-stack)
-                                        (interpret-internal new-stack
-                                                            (+ index 1)
-                                                            dictionary)))))
+                                    ((_ new-stack)
+                                     (interpret-internal new-stack
+                                                         (+ index 1)
+                                                         dictionary)))))
             (if (number? command)
                 (call-next (cons command stack))
                 (case command
                   (+ (call-next (cons (+ (cadr stack) (car stack))
-                                         (cddr stack))))
+                                      (cddr stack))))
                   (- (call-next (cons (- (cadr stack) (car stack))
-                                         (cddr stack))))
+                                      (cddr stack))))
                   (* (call-next (cons (* (cadr stack) (car stack))
-                                         (cddr stack))))
+                                      (cddr stack))))
                   (/ (call-next (cons (quotient (cadr stack) (car stack))
-                                         (cddr stack))))
+                                      (cddr stack))))
                   (mod (call-next (cons (remainder (cadr stack) (car stack))
-                                           (cddr stack))))
+                                        (cddr stack))))
                   (neg (call-next (cons (- (car stack))
-                                           (cdr stack))))
+                                        (cdr stack))))
                   (= (call-next (cons (if (= (cadr stack) (car stack))
-                                             -1
-                                             0)
-                                         (cddr stack))))
+                                          -1
+                                          0)
+                                      (cddr stack))))
                   (< (call-next (cons (if (< (cadr stack) (car stack))
-                                             -1
-                                             0)
-                                         (cddr stack))))
+                                          -1
+                                          0)
+                                      (cddr stack))))
                   (> (call-next (cons (if (> (cadr stack) (car stack))
-                                             -1
-                                             0)
-                                         (cddr stack))))
+                                          -1
+                                          0)
+                                      (cddr stack))))
                   (not (call-next (cons (if (equal? (car stack) 0)
-                                               -1
-                                               0)
-                                           (cdr stack))))
+                                            -1
+                                            0)
+                                        (cdr stack))))
                   (and (call-next (cons (if (and (not (equal? (car stack) 0))
-                                                    (not (equal? (cadr stack) 0)))
-                                               -1
-                                               0)
-                                           (cddr stack))))
+                                                 (not (equal? (cadr stack) 0)))
+                                            -1
+                                            0)
+                                        (cddr stack))))
                   (or (call-next (cons (if (or (not (equal? (car stack) 0))
-                                                  (not (equal? (cadr stack) 0)))
-                                              -1
-                                              0)
-                                          (cddr stack))))
+                                               (not (equal? (cadr stack) 0)))
+                                           -1
+                                           0)
+                                       (cddr stack))))
                   (drop (call-next (cdr stack)))
                   (swap (call-next (cons (cadr stack)
-                                            (cons (car stack) (cddr stack)))))
+                                         (cons (car stack) (cddr stack)))))
                   (dup (call-next (cons (car stack) stack)))
                   (over (call-next (cons (cadr stack) stack)))
                   (rot (call-next (cons (caddr stack)
-                                           (cons (cadr stack)
-                                                 (cons (car stack) (cdddr stack))))))
+                                        (cons (cadr stack)
+                                              (cons (car stack) (cdddr stack))))))
                   (depth (call-next (cons (length stack) stack)))
                   (define (interpret-internal stack
                                               (+ 1 ;; следующее слово за end
@@ -135,5 +135,5 @@
                             ;; ищем статью в словаре
                             (let ((jmp-index (cadr (assoc command dictionary))))
                               (call-next (interpret-internal stack
-                                                                jmp-index
-                                                                dictionary))))))))))))
+                                                             jmp-index
+                                                             dictionary))))))))))))
