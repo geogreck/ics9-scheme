@@ -164,6 +164,60 @@
                                     700
                                 endif
                             endif) '())
-              (700 1 300 10))))
+              (700 1 300 10))
+        (test (interpret #(define -- 1 - end
+                            4 dup while -- dup wend) '())
+              (0))))
+
+(define feature-if-else
+  (list (test (interpret #(1 if 100 else 200 endif) '())
+              (100))
+        (test (interpret #(0 if 100 else 200 endif) '())
+              (200))))
+
+(define feature-nested-if
+  (list (test (interpret #(0 if 1 if 2 endif 3 endif 4) '())
+              (4))
+        (test (interpret #(1 if 2 if 3 endif 4 endif 5) '())
+              (5 4 3))
+        (test (interpret #(1 if 0 if 2 endif 3 endif 4) '())
+              (4 3))))
+
+(define feature-while-loop
+  (list (test (interpret #(while wend) '(3 7 4 0 5 9))
+              (5 9))
+        (test (interpret #(define sum
+                            dup
+                            while + swap dup wend
+                            drop
+                            end
+                            1 2 3 0 4 5 6 sum)
+                         '())
+              (15 3 2 1))
+        (test (interpret #(define power2
+                            1 swap dup
+                            while
+                                swap 2 * swap 1 - dup
+                            wend
+                            drop
+                            end
+                            5 power2 3 power2 power2) '())
+              (256 32))))
+
+(define feature-repeat-loop
+  (list (test 'TODO TODO)))
+
+(define feature-for-loop
+  (list (test (interpret #(define fact
+                            1 1 rot for i * next
+                            end
+                            6 fact 10 fact)
+                         '())
+              (3628800 720))))
 
 (run-tests tests)
+(run-tests feature-if-else)
+(run-tests feature-nested-if)
+(run-tests feature-while-loop)
+(run-tests feature-repeat-loop)
+(run-tests feature-for-loop)
