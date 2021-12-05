@@ -146,27 +146,3 @@
 (perim s)
 (perim c)
 
-;;:;extra
-;;task 2
-(define-syntax my-let
-  (syntax-rules ()
-    ((my-let ((var val)) body) ((lambda (var) body) val))
-    ((my-let ((var val) . xs) body) (my-let xs ((lambda (var) body) val)))))
-
-(define-syntax my-let*
-  (syntax-rules ()
-    ((my-let* ((var val)) body) ((lambda (var) body) val))
-    ((my-let* ((var val) . xs) body) (my-let ((var val))
-                                             (my-let* (xs) body)))))
-;;task 1
-(((call-with-current-continuation
-   (lambda (c) c))
-  (lambda (x) x))
- 'hello)
-;В переменную с кладется контекст, который сразу же вызывается и возвращает lambda от x, которая получает на вход 'hello и просто возвращает его же
-
-;;task 3
-;;Как мне кажется, так будет работать не всегда, так как это DrRacket производит вычисления слева направо.
-;;Соответственно, в первом случае в функцию суммирования сначала попадет значение x, а потом уже будет запомнен контекст вычислений, с постоянным значением x
-;;Во втором же случае сначала будет запомнем контекст, а потом будет произведен вызов значения x, а так как значение x каждый раз меняется с помощью set!,
-;;то при каждом возврате к контексту значение x будет новое
