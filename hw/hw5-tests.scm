@@ -214,6 +214,19 @@
                             6 fact 10 fact)
                          '())
               (3628800 720))))
+(define feature-global
+  (list (test (interpret #(defvar counter 0
+                            define next1
+                              counter 1 + set counter
+                            end
+                            counter
+                            next1 counter next1
+                            counter next1 counter next1 +
+                            next1 next1
+                            counter next1 counter next1 *)
+                         '())
+              (42 5 1 0))))
+              
 
 (run-tests tests)
 (run-tests feature-if-else)
@@ -221,3 +234,4 @@
 (run-tests feature-while-loop)
 (run-tests feature-repeat-loop)
 (run-tests feature-for-loop)
+(run-tests feature-global)

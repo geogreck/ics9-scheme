@@ -11,6 +11,9 @@
 (define feature-while-loop #t)
 (define feature-repeat-loop #t)
 (define feature-for-loop #t)
+(define feature-global #t)
+
+(load "../trace.scm")
 
 ;; -> stack после выполнения program
 (define (interpret program stack)
@@ -121,6 +124,17 @@
                                                          (+ index 2)) ;; (название-статьи индекс-первого-слова-статьи)
                                                         dictionary)
                                                   for-stack))
+                      (defvar (interpret-internal stack
+                                                  (+ index 3)
+                                                  (cons (list (vector-ref program (+ index 1))
+                                                              'var
+                                                              (vector-ref program (+ index 2)))
+                                                        dictionary)
+                                                  for-stack))
+                      (set (interpret-internal (cdr stack)
+                                               (+ index 2)
+                                               (set-cdr! (cdr (assoc (vector-ref program (+ index 1)) dictionary)) (list (car stack)))
+                                               for-stack))
                       (end stack)
                       (exit stack)
                       (if (if (= 0 (car stack))
@@ -183,9 +197,12 @@
                                                     dictionary
                                                     for-stack)
                                 ;; ищем статью в словаре
-                                (let ((jmp-index (cadr (assoc command dictionary))))
-                                  (call-next (interpret-internal stack
-                                                                 jmp-index
-                                                                 dictionary
-                                                                 for-stack))))))))))))))
+                                (if (eqv? (cadr (assoc command dictionary)) 'var)
+                                    (call-next (cons (caddr (assoc command dictionary)) stack))
+                                    (let ((jmp-index (cadr (assoc command dictionary))))
+                                      (call-next (interpret-internal stack
+                                                                     jmp-index
+                                                                     dictionary
+                                                                     for-stack)))))))))))))))
 
+  
