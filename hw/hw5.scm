@@ -12,6 +12,8 @@
 (define feature-repeat-loop #t)
 (define feature-for-loop #t)
 (define feature-global #t)
+(define feature-tail-call #t)
+
 
 (load "../trace.scm")
 
@@ -189,6 +191,11 @@
                                                       (vector-ref jmps index)
                                                       dictionary
                                                       (cons i (cdr for-stack))))))
+                      (tail (let ((jmp-index (cadr (assoc (vector-ref program (+ index 1)) dictionary))))
+                                      (interpret-internal stack
+                                                                     jmp-index
+                                                                     dictionary
+                                                                     for-stack)))
                       (i (call-next (cons (car for-stack) stack)))
                       ;; в case нельзя использовать else, поэтому обработаю его тут
                       (else (if (eqv? command 'else)

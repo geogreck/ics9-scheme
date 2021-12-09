@@ -214,6 +214,24 @@
                             6 fact 10 fact)
                          '())
               (3628800 720))))
+
+(define feature-tail-call
+  (list (test (interpret #(define F 11 22 33 tail G 44 55 end
+                            define G 77 88 99 end
+                            F)
+                         '())
+              (99 88 77 33 22 11))
+        (test (interpret #(define =0? dup 0 = end
+                            define gcd
+                            =0? if drop exit endif
+                            swap over mod
+                            tail gcd
+                            end
+                            90 99 gcd
+                            234 8100 gcd) '())
+              (18 9))))
+              
+
 (define feature-global
   (list (test (interpret #(defvar counter 0
                             define next1
