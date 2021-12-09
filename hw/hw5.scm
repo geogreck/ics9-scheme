@@ -15,10 +15,6 @@
 (define feature-tail-call #t)
 (define feature-hi-level #t)
 
-
-
-(load "../trace.scm")
-
 ;; -> stack после выполнения program
 (define (interpret program stack)
   (let ((jmps (make-vector (vector-length program))))
@@ -51,7 +47,6 @@
                              (loop (+ index 1) (cdr stack))))
                 (lam (loop (+ index 1) (cons index stack)))
                 (endlam (begin (vector-set! jmps (car stack) (+ 1 index))
-                               (vector-set! jmps index (car stack))
                                (loop (+ index 1) (cdr stack))))
                 (else (if (eqv? command 'else)
                           (begin (vector-set! jmps (car stack) (+ 1 index))
