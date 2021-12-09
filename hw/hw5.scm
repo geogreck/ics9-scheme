@@ -13,6 +13,8 @@
 (define feature-for-loop #t)
 (define feature-global #t)
 (define feature-tail-call #t)
+(define feature-hi-level #t)
+
 
 
 (load "../trace.scm")
@@ -47,6 +49,10 @@
                 (next (begin (vector-set! jmps index (+ 1 (car stack)))
                              (vector-set! jmps (car stack) (+ index 1))
                              (loop (+ index 1) (cdr stack))))
+                (lam (loop (+ index 1) (cons index stack)))
+                (endlam (begin (vector-set! jmps (car stack) (+ 1 index))
+                               (vector-set! jmps index (car stack))
+                               (loop (+ index 1) (cdr stack))))
                 (else (if (eqv? command 'else)
                           (begin (vector-set! jmps (car stack) (+ 1 index))
                                  (loop (+ index 1) (cons index (cdr stack))))
@@ -114,6 +120,16 @@
                       (rot (call-next (cons (caddr stack)
                                             (cons (cadr stack)
                                                   (cons (car stack) (cdddr stack))))))
+                      (& (interpret-internal (cons (cadr (assoc (vector-ref program (+ index 1)) dictionary))
+                                                   stack)
+                                             (+ index 2)
+                                             dictionary
+                                             for-stack))
+                      (apply (let ((jmp-index (car stack)))
+                                      (call-next (interpret-internal (cdr stack)
+                                                                     jmp-index
+                                                                     dictionary
+                                                                     for-stack))))
                       (depth (call-next (cons (length stack) stack)))
                       (define (interpret-internal stack
                                                   (+ 1 ;; следующее слово за end
@@ -139,6 +155,11 @@
                                                for-stack))
                       (end stack)
                       (exit stack)
+                      (endlam stack)
+                      (lam (interpret-internal (cons (+ index 1) stack)
+                                               (vector-ref jmps index)
+                                               dictionary
+                                               for-stack))
                       (if (if (= 0 (car stack))
                               ;; выполняем вторую ветку, если она есть
                               (interpret-internal (cdr stack)
@@ -192,10 +213,10 @@
                                                       dictionary
                                                       (cons i (cdr for-stack))))))
                       (tail (let ((jmp-index (cadr (assoc (vector-ref program (+ index 1)) dictionary))))
-                                      (interpret-internal stack
-                                                                     jmp-index
-                                                                     dictionary
-                                                                     for-stack)))
+                              (interpret-internal stack
+                                                  jmp-index
+                                                  dictionary
+                                                  for-stack)))
                       (i (call-next (cons (car for-stack) stack)))
                       ;; в case нельзя использовать else, поэтому обработаю его тут
                       (else (if (eqv? command 'else)
@@ -212,4 +233,3 @@
                                                                      dictionary
                                                                      for-stack)))))))))))))))
 
-  

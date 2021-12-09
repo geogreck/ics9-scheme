@@ -215,6 +215,36 @@
                          '())
               (3628800 720))))
 
+(define feature-hi-level
+  (list (test (interpret #(define power
+                              dup 0 = if drop drop exit endif
+                              rot
+                              over
+                              apply
+                              rot
+                              1 -
+                              power
+                           end
+                           define square dup * end
+                           3 & square 3 power
+                           2 lam dup dup * * endlam 2 power)
+                         '())
+              (512 6561))
+        (test (interpret #(define power
+                              dup 0 = if drop drop exit endif
+                              rot
+                              over
+                              apply
+                              rot
+                              1 -
+                              power
+                           end
+                           define square dup * end
+                           3 & square 3 power)
+                         '())
+              (6561))))
+                           
+
 (define feature-tail-call
   (list (test (interpret #(define F 11 22 33 tail G 44 55 end
                             define G 77 88 99 end
@@ -252,4 +282,6 @@
 (run-tests feature-while-loop)
 (run-tests feature-repeat-loop)
 (run-tests feature-for-loop)
+(run-tests feature-hi-level)
+(run-tests feature-tail-call)
 (run-tests feature-global)
