@@ -229,6 +229,17 @@
                          '())
               (8 4))))
 
+(define feature-switch-case
+  (list (test (interpret #(3
+                           switch
+                             case 1 2 exitcase
+                             case 2 3
+                             case 3 4
+                             case 4 5 exitcase
+                           endswitch)
+                         '())
+              (5 4))))
+
 (define feature-hi-level
   (list (test (interpret #(define power
                               dup 0 = if drop drop exit endif
@@ -297,6 +308,7 @@
 (run-tests feature-repeat-loop)
 (run-tests feature-for-loop)
 (run-tests feature-break-continue)
+(run-tests feature-switch-case)
 (run-tests feature-hi-level)
 (run-tests feature-tail-call)
 (run-tests feature-global)

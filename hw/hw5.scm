@@ -12,6 +12,7 @@
 (define feature-repeat-loop #t)
 (define feature-for-loop #t)
 (define feature-break-continue #t)
+(define feature-switch-case #t)
 (define feature-hi-level #t)
 (define feature-tail-call #t)
 (define feature-global #t)
@@ -123,10 +124,10 @@
                                              dictionary
                                              for-stack))
                       (apply (let ((jmp-index (car stack)))
-                                      (call-next (interpret-internal (cdr stack)
-                                                                     jmp-index
-                                                                     dictionary
-                                                                     for-stack))))
+                               (call-next (interpret-internal (cdr stack)
+                                                              jmp-index
+                                                              dictionary
+                                                              for-stack))))
                       (depth (call-next (cons (length stack) stack)))
                       (define (interpret-internal stack
                                                   (+ 1 ;; следующее слово за end
@@ -239,6 +240,33 @@
                                                       jmp-index
                                                       dictionary
                                                       for-stack)))
+                      (switch (let ((jmp-index (let loop ((index (+ index 1)))
+                                                 (case (vector-ref program index)
+                                                   (case (if (= (vector-ref program (+ index 1))
+                                                                (car stack))
+                                                             (+ index 2)
+                                                             (loop (+ index 2))))
+                                                   (endswitch (+ index 1))
+                                                   (else (loop (+ index 1)))))))
+                                (interpret-internal (cdr stack)
+                                                    jmp-index
+                                                    dictionary
+                                                    for-stack)))
+                      (case (interpret-internal stack
+                                                (+ index 2)
+                                                dictionary
+                                                for-stack))
+                      ;; переход на слово за endswitch
+                      ;; endswitch ищем наивно
+                      (exitcase (let ((jmp-index (let loop ((index (+ index 1)))
+                                                   (if (eqv? 'endswitch (vector-ref program index))
+                                                       (+ index 1)
+                                                       (loop (+ index 1))))))
+                                  (interpret-internal stack
+                                                      jmp-index
+                                                      dictionary
+                                                      for-stack)))
+                      (endswitch (call-next stack))
                       ;; в case нельзя использовать else, поэтому обработаю его тут
                       (else (if (eqv? command 'else)
                                 (interpret-internal stack
