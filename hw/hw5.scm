@@ -11,13 +11,11 @@
 (define feature-while-loop #t)
 (define feature-repeat-loop #t)
 (define feature-for-loop #t)
-(define feature-global #t)
-(define feature-tail-call #t)
+(define feature-break-continue #t)
+(define feature-switch-case #t)
 (define feature-hi-level #t)
-
-
-
-(load "../trace.scm")
+(define feature-tail-call #t)
+(define feature-global #t)
 
 ;; -> stack после выполнения program
 (define (interpret program stack)
@@ -29,6 +27,7 @@
       ;; while wend: while -> wend + 1, wend -> while
       ;; repeat until: repeat + 1 <- until
       ;; for next: for -> next + 1, next -> for + 1
+      ;; lam endlam: lam -> endlam + 1
       ;; и сохраним их в вектор jmps[i] = индекс соответствующего слова
       (let loop ((index 0)
                  (stack '()))
@@ -51,7 +50,6 @@
                              (loop (+ index 1) (cdr stack))))
                 (lam (loop (+ index 1) (cons index stack)))
                 (endlam (begin (vector-set! jmps (car stack) (+ 1 index))
-                               (vector-set! jmps index (car stack))
                                (loop (+ index 1) (cdr stack))))
                 (else (if (eqv? command 'else)
                           (begin (vector-set! jmps (car stack) (+ 1 index))
@@ -126,10 +124,10 @@
                                              dictionary
                                              for-stack))
                       (apply (let ((jmp-index (car stack)))
-                                      (call-next (interpret-internal (cdr stack)
-                                                                     jmp-index
-                                                                     dictionary
-                                                                     for-stack))))
+                               (call-next (interpret-internal (cdr stack)
+                                                              jmp-index
+                                                              dictionary
+                                                              for-stack))))
                       (depth (call-next (cons (length stack) stack)))
                       (define (interpret-internal stack
                                                   (+ 1 ;; следующее слово за end
@@ -218,6 +216,57 @@
                                                   dictionary
                                                   for-stack)))
                       (i (call-next (cons (car for-stack) stack)))
+                      ;; наивно найдем ближайший wend/until/next и выполним следующую за ним команду
+                      ;; если найден next уберем с for-stack 2 элемента
+                      (break (let ((jmp-index (let loop ((index (+ index 1)))
+                                                (if (member (vector-ref program index) '(wend until next))
+                                                    index
+                                                    (loop (+ index 1))))))
+                               (if (eqv? 'next (vector-ref program jmp-index))
+                                   (interpret-internal stack
+                                                       (+ jmp-index 1)
+                                                       dictionary
+                                                       (cddr for-stack))
+                                   (interpret-internal stack
+                                                       (+ jmp-index 1)
+                                                       dictionary
+                                                       for-stack))))
+                      ;; наивно найдем ближайший wend/until/next и выполним его
+                      (continue (let ((jmp-index (let loop ((index (+ index 1)))
+                                                   (if (member (vector-ref program index) '(wend until next))
+                                                       index
+                                                       (loop (+ index 1))))))
+                                  (interpret-internal stack
+                                                      jmp-index
+                                                      dictionary
+                                                      for-stack)))
+                      (switch (let ((jmp-index (let loop ((index (+ index 1)))
+                                                 (case (vector-ref program index)
+                                                   (case (if (= (vector-ref program (+ index 1))
+                                                                (car stack))
+                                                             (+ index 2)
+                                                             (loop (+ index 2))))
+                                                   (endswitch (+ index 1))
+                                                   (else (loop (+ index 1)))))))
+                                (interpret-internal (cdr stack)
+                                                    jmp-index
+                                                    dictionary
+                                                    for-stack)))
+                      (case (interpret-internal stack
+                                                (+ index 2)
+                                                dictionary
+                                                for-stack))
+                      ;; переход на слово за endswitch
+                      ;; endswitch ищем наивно
+                      (exitcase (let ((jmp-index (let loop ((index (+ index 1)))
+                                                   (if (eqv? 'endswitch (vector-ref program index))
+                                                       (+ index 1)
+                                                       (loop (+ index 1))))))
+                                  (interpret-internal stack
+                                                      jmp-index
+                                                      dictionary
+                                                      for-stack)))
+                      (endswitch (call-next stack))
                       ;; в case нельзя использовать else, поэтому обработаю его тут
                       (else (if (eqv? command 'else)
                                 (interpret-internal stack
