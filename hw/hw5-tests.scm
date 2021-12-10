@@ -205,7 +205,10 @@
               (256 32))))
 
 (define feature-repeat-loop
-  (list (test 'TODO TODO)))
+  (list (test (interpret #(define <4? dup 4 < end
+                            1 repeat dup + <4? until)
+                         '())
+              (4))))
 
 (define feature-for-loop
   (list (test (interpret #(define fact
@@ -214,6 +217,17 @@
                             6 fact 10 fact)
                          '())
               (3628800 720))))
+
+(define feature-break-continue
+  (list (test (interpret #(define >4? dup 4 > end
+                            1 1 while dup + >4? if break endif dup wend)
+                         '())
+              (8))
+        (test (interpret #(define >4? dup 4 > end
+                            define >2? dup 2 > end
+                            1 1 while dup + >4? if break endif >2? if dup dup continue endif dup wend)
+                         '())
+              (8 4))))
 
 (define feature-hi-level
   (list (test (interpret #(define power
@@ -282,6 +296,7 @@
 (run-tests feature-while-loop)
 (run-tests feature-repeat-loop)
 (run-tests feature-for-loop)
+(run-tests feature-break-continue)
 (run-tests feature-hi-level)
 (run-tests feature-tail-call)
 (run-tests feature-global)

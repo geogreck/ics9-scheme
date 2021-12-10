@@ -11,9 +11,10 @@
 (define feature-while-loop #t)
 (define feature-repeat-loop #t)
 (define feature-for-loop #t)
-(define feature-global #t)
-(define feature-tail-call #t)
+(define feature-break-continue #t)
 (define feature-hi-level #t)
+(define feature-tail-call #t)
+(define feature-global #t)
 
 ;; -> stack после выполнения program
 (define (interpret program stack)
@@ -25,6 +26,7 @@
       ;; while wend: while -> wend + 1, wend -> while
       ;; repeat until: repeat + 1 <- until
       ;; for next: for -> next + 1, next -> for + 1
+      ;; lam endlam: lam -> endlam + 1
       ;; и сохраним их в вектор jmps[i] = индекс соответствующего слова
       (let loop ((index 0)
                  (stack '()))
@@ -213,6 +215,30 @@
                                                   dictionary
                                                   for-stack)))
                       (i (call-next (cons (car for-stack) stack)))
+                      ;; наивно найдем ближайший wend/until/next и выполним следующую за ним команду
+                      ;; если найден next уберем с for-stack 2 элемента
+                      (break (let ((jmp-index (let loop ((index (+ index 1)))
+                                                (if (member (vector-ref program index) '(wend until next))
+                                                    index
+                                                    (loop (+ index 1))))))
+                               (if (eqv? 'next (vector-ref program jmp-index))
+                                   (interpret-internal stack
+                                                       (+ jmp-index 1)
+                                                       dictionary
+                                                       (cddr for-stack))
+                                   (interpret-internal stack
+                                                       (+ jmp-index 1)
+                                                       dictionary
+                                                       for-stack))))
+                      ;; наивно найдем ближайший wend/until/next и выполним его
+                      (continue (let ((jmp-index (let loop ((index (+ index 1)))
+                                                   (if (member (vector-ref program index) '(wend until next))
+                                                       index
+                                                       (loop (+ index 1))))))
+                                  (interpret-internal stack
+                                                      jmp-index
+                                                      dictionary
+                                                      for-stack)))
                       ;; в case нельзя использовать else, поэтому обработаю его тут
                       (else (if (eqv? command 'else)
                                 (interpret-internal stack
