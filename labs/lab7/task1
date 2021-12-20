@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+while true; do
+    $1 >> "stdout" 2>> "stderr" &
+    sleep $(("$2" * 60 ))
+    kill -9 "$!"
+    echo "цикл"
+done
