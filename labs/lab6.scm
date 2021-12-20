@@ -57,7 +57,9 @@
 ;<space> ::= space | tab | line feed | form feed | carriage return
 
 (define (scan-many-fracs fracs)
-  (let loop ((buf '()) (xs (string->list (string-append fracs " "))) (fracs '()))
+  (let loop ((buf '())
+             (xs (string->list (string-append fracs " ")))
+             (fracs '()))
     (if (not (null? xs))
         (let ((s (car xs)))
           (if (char-whitespace? s)
@@ -102,7 +104,8 @@
           (case s
             (if (let ((tail (if-tail program)))
                   (if tail
-                      (loop tail (append parsed (list (list 'if (loop (cdr program) '() (cons 'if buf))))) buf))))
+                      (loop tail (append parsed (list (list 'if (loop (cdr program) '() (cons 'if buf))))) buf)
+                      (exit #f))))
             (endif (if (and (not (null? buf))
                             (equal? 'if (car buf)))
                        parsed
