@@ -11,6 +11,13 @@ sub test {
     return $a + $b;
 }
 
+sub fibonacci {
+    my ($n) = @_;
+    print "fibonacci($n)\n";
+    return 1 if $n == 1 or $n == 2;
+    return fibonacci($n-1) + fibonacci($n-2);
+}
+
 sub memoize {
     my ($func) = @_;
  
@@ -33,3 +40,6 @@ memoize('test');
 print test(1, 2), "\n";
 print test(1, 2), "\n";
 print test(3, 3), "\n";
+
+memoize('fibonacci');
+ print fibonacci(6);

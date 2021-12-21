@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-sleep 10m
+sleep 100
 echo "всем привет я только проснулся"
