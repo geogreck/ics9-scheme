@@ -42,7 +42,7 @@
                              (vector-set! jmps index (car stack))
                              (loop (+ index 1) (cdr stack))))
                 (repeat (loop (+ index 1) (cons index stack)))
-                (until (begin (vector-set! jmps index (+ 1 (car stack)))
+                (until (begin (vector-set! jmps index (car stack))
                               (loop (+ index 1) (cdr stack))))
                 (for (loop (+ index 1) (cons index stack)))
                 (next (begin (vector-set! jmps index (+ 1 (car stack)))
@@ -183,7 +183,7 @@
                                                 dictionary
                                                 for-stack))
                       (repeat (call-next stack))
-                      (until (if (= 0 (car stack))
+                      (until (if (not (= 0 (car stack)))
                                  (call-next (cdr stack))
                                  (interpret-internal (cdr stack)
                                                      (vector-ref jmps index)
