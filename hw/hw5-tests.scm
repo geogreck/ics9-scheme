@@ -205,10 +205,10 @@
               (256 32))))
 
 (define feature-repeat-loop
-  (list (test (interpret #(define <4? dup 4 < end
-                            1 repeat dup + <4? until)
+  (list (test (interpret #(define >4? dup 4 > end
+                            1 repeat dup + >4? until)
                          '())
-              (4))))
+              (8))))
 
 (define feature-for-loop
   (list (test (interpret #(define fact
